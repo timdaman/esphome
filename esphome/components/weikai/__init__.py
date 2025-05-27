@@ -16,6 +16,7 @@ CODEOWNERS = ["@DrCoolZic"]
 AUTO_LOAD = ["uart"]
 
 MULTI_CONF = True
+CONF_DATA_BITS = "data_bits"
 CONF_STOP_BITS = "stop_bits"
 CONF_PARITY = "parity"
 CONF_CRYSTAL = "crystal"
@@ -60,6 +61,11 @@ WKBASE_SCHEMA = cv.Schema(
                 cv.Required(CONF_ID): cv.declare_id(WeikaiChannel),
                 cv.Optional(CONF_CHANNEL, default=0): cv.int_range(min=0, max=3),
                 cv.Required(CONF_BAUD_RATE): cv.int_range(min=1),
+                # This resolves https://github.com/esphome/issues/issues/6858
+                # Validators failed if they couldn't set data_bits.
+                # These UART expanders only support 8 bits so we let data_bits be set but
+                # force the value to 8 which satisfies the validators.
+                cv.Optional(CONF_DATA_BITS, default=8): cv.one_of(8, int=True),
                 cv.Optional(CONF_STOP_BITS, default=1): cv.one_of(1, 2, int=True),
                 cv.Optional(CONF_PARITY, default="NONE"): cv.enum(
                     uart.UART_PARITY_OPTIONS, upper=True
